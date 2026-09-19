@@ -16,4 +16,15 @@ describe('SauceDemo Login', () => {
     cy.get('#login-button').click()
     cy.get('[data-test="error"]').should('contain', 'locked out')
   })
+
+  it('requires a username',() => {
+    cy.get('#login-button').click()
+    cy.get('[data-test="error"]').should('contain', 'Username is required')
+  })
+
+    it('requires a password', () => {
+    cy.get('#user-name').type('standard_user')
+    cy.get('#login-button').click()
+    cy.get('[data-test="error"]').should('contain', 'Password is required')
+  })
 })
