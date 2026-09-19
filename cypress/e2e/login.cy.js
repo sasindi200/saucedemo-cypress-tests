@@ -1,30 +1,33 @@
+import loginPage from '../pages/LoginPage'
+
 describe('SauceDemo Login', () => {
   beforeEach(() => {
-    cy.visit('/')
+    loginPage.visit()
   })
 
   it('logs in successfully with valid credentials', () => {
-    cy.get('#user-name').type('standard_user')
-    cy.get('#password').type('secret_sauce')
-    cy.get('#login-button').click()
-    cy.url().should('include', '/inventory.html')
+    cy.fixture('users').then((users) => {
+      loginPage.login(users.standard.username, users.standard.password)
+      cy.url().should('include', '/inventory.html')
+    })
   })
 
   it('shows an error for a locked out user', () => {
-    cy.get('#user-name').type('locked_out_user')
-    cy.get('#password').type('secret_sauce')
-    cy.get('#login-button').click()
-    cy.get('[data-test="error"]').should('contain', 'locked out')
+    cy.fixture('users').then((users) => {
+      loginPage.login(users.lockedOut.username, users.lockedOut.password)
+      loginPage.getErrorMessage().should('contain', 'locked out')
+    })
   })
 
-  it('requires a username',() => {
-    cy.get('#login-button').click()
-    cy.get('[data-test="error"]').should('contain', 'Username is required')
+  it('requires a username', () => {
+    loginPage.enterPassword('secret_sauce')
+    loginPage.submit()
+    loginPage.getErrorMessage().should('contain', 'Username is required')
   })
 
-    it('requires a password', () => {
-    cy.get('#user-name').type('standard_user')
-    cy.get('#login-button').click()
-    cy.get('[data-test="error"]').should('contain', 'Password is required')
+  it('requires a password', () => {
+    loginPage.enterUsername('standard_user')
+    loginPage.submit()
+    loginPage.getErrorMessage().should('contain', 'Password is required')
   })
 })
